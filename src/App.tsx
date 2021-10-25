@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import OnlineLogo from './logo.svg'
 import Form from './components/Form'
 import Leaderboard from './components/Leaderboard'
-import { setState } from './storage'
+import { useLocalStorage } from './storage'
 
 export interface LeaderboardEntry {
   name: string,
@@ -10,24 +10,16 @@ export interface LeaderboardEntry {
   language: string
 }
 
-export interface AppProps {
-  initialState: LeaderboardEntry[]
-}
-
-export default function App({ initialState }: AppProps) {
+export default function App() {
   const [isFormVisible, setFormVisible] = useState(false)
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(initialState)
+  const [leaderboard, setLeaderboard] = useLocalStorage<LeaderboardEntry[]>('leaderboard', [])
 
-  useEffect(() => {
-    setState(leaderboard)
-  }, [leaderboard])
-
-  const onSubmit = (entry: LeaderboardEntry) => {
+  const handleSubmit = (entry: LeaderboardEntry) => {
     setLeaderboard((prev) => [...prev, entry].sort((x, y) => x.bytes - y.bytes))
     setFormVisible(false)
   }
 
-  const onDelete = (index: number) => {
+  const handleEntryDeletion = (index: number) => {
     setLeaderboard((prev) => prev.filter((_, i) => index != i))
   }
 
@@ -41,10 +33,10 @@ export default function App({ initialState }: AppProps) {
             Leaderboard</h1>
         </div>
         <div>
-          {isFormVisible && <Form onSubmit={onSubmit} />}
+          {isFormVisible && <Form onFormSubmit={handleSubmit} />}
         </div>
         <div className="pb-16">
-          <Leaderboard entries={leaderboard} onDelete={onDelete} />
+          <Leaderboard entries={leaderboard} onEntryDeletion={handleEntryDeletion} />
         </div>
       </section>
     </main>
