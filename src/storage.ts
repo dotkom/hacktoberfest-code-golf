@@ -5,6 +5,8 @@ const getLocalStorageState = <T>(key: string, orElse: T): T => {
     const data = localStorage.getItem(key)
     if (data) {
       return JSON.parse(data)
+    } else {
+      return orElse
     }
   } catch {}
   return orElse
